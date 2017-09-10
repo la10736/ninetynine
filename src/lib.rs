@@ -1,20 +1,61 @@
-struct Bottles {}
+struct Bottles {
+    verses_cache: Vec<Option<String>>
+}
 
 impl Bottles {
     pub fn new() -> Self {
-        Bottles {}
+        Bottles { verses_cache: vec![None; 100] }
     }
 
-    pub fn song(&self) -> &str {
-        ""
+    pub fn song(&mut self) -> String {
+        self.verses(99, 0)
     }
 
-    fn verse(&self, pos: usize) -> &str {
-        ""
+    fn verse(&mut self, pos: usize) -> &str {
+        if self.verses_cache[pos].is_none() {
+            self.verses_cache[pos] = Some(
+                self.build_verse(pos)
+            )
+        }
+        self.verses_cache[pos].as_ref().unwrap()
     }
 
-    fn verses(&self, hi: usize, low: usize) -> &str {
-        ""
+    fn verses(&mut self, hi: usize, low: usize) -> String {
+        let mut res = Vec::new();
+        for p in (low..hi+1).rev(){
+            self.verse(p);
+            res.push(self.verses_cache[p].as_ref().unwrap().clone())
+        }
+        return res.join("\n\n")
+    }
+
+    fn build_verse(&self, pos: usize) -> String {
+        let on_the_wall = pos;
+        let remain = if pos == 0 { 99 } else { pos - 1};
+        format!("{} on the wall, {}.\n\
+                {}, {} on the wall.",
+                Self::bottles_of_beer(on_the_wall),
+                Self::bottles_of_beer(on_the_wall).to_lowercase(),
+                Self::take_beer(on_the_wall),
+                Self::bottles_of_beer(remain).to_lowercase())
+    }
+
+    fn take_beer(pos: usize) -> String {
+        match pos {
+            0 => "Go to the store and buy some more",
+            1 => "Take it down and pass it around",
+            _ => "Take one down and pass it around"
+        }.to_string()
+    }
+
+    fn bottles_of_beer(number: usize) -> String {
+        let bottle = if number!=1 {"bottles"} else {"bottle"};
+        format!("{} of beer", match number {
+            0 => "No more bottles".to_string(),
+            1 => "1 bottle".to_string(),
+            n => format!("{} bottles", n),
+        }
+        )
     }
 }
 
@@ -38,7 +79,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn first_verse() {
         let expected = r#"
         99 bottles of beer on the wall, 99 bottles of beer.
@@ -49,7 +89,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn another_verse() {
         let expected = r#"
         89 bottles of beer on the wall, 89 bottles of beer.
@@ -60,7 +99,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn verse_2() {
         let expected = r#"
         2 bottles of beer on the wall, 2 bottles of beer.
@@ -71,7 +109,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn verse_1() {
         let expected = r#"
         1 bottle of beer on the wall, 1 bottle of beer.
@@ -82,7 +119,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn verse_0() {
         let expected = r#"
         No more bottles of beer on the wall, no more bottles of beer.
@@ -93,7 +129,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn a_couple_verses() {
         let expected = r#"
         99 bottles of beer on the wall, 99 bottles of beer.
@@ -107,7 +142,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn a_few_verses() {
         let expected = r#"
         2 bottles of beer on the wall, 2 bottles of beer.
@@ -124,7 +158,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn the_whole_song() {
         let expected = r#"
         99 bottles of beer on the wall, 99 bottles of beer.

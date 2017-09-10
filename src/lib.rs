@@ -9,11 +9,11 @@ impl Bottles {
         ""
     }
 
-    fn verse(&self, pos: isize) -> &str {
+    fn verse(&self, pos: usize) -> &str {
         ""
     }
 
-    fn verses(&self, hi: isize, low: isize) -> &str {
+    fn verses(&self, hi: usize, low: usize) -> &str {
         ""
     }
 }
